@@ -32,11 +32,6 @@ export class ShoppingcartsController {
     return this.shoppingcartsService.findOne(+productId, 1);
   }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateShoppingcartDto: UpdateShoppingcartDto) {
-  //   return this.shoppingcartsService.update(+id, updateShoppingcartDto);
-  // }
-
   @Delete(':id')
   remove(@Param('id') productId: number) {
     return this.shoppingcartsService.remove(+productId);

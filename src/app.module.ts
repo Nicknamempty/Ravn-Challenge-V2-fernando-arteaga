@@ -7,7 +7,8 @@ import { UsersModule } from './users/users.module';
 import { RolesModule } from './roles/roles.module';
 import { ShoppingcartsModule } from './shoppingcarts/shoppingcarts.module';
 import { OrdersModule } from './orders/orders.module';
-import { MulterModule } from '@nestjs/platform-express';
+
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { MulterModule } from '@nestjs/platform-express';
     RolesModule,
     ShoppingcartsModule,
     OrdersModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
