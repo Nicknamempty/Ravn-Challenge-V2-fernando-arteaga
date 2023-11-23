@@ -13,24 +13,78 @@ datasource db {
 model User {
   id          Int      @id @default(autoincrement())
   email       String   @unique
+  productsLiked LikesByProduct[]
+  productsOnShoppingCart  ShoppingCart[]
+  PurchasedProducts  Order[]
+  role Role? @relation(fields: [roleId],references: [id])
+  roleId   Int? 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
 
 model Product {
-  id           Int     @id @default(autoincrement())
+  id           Int     @id  @default(autoincrement())
   name         String   @unique
   description  String 
   image        String  @default("none.png")
   price        Decimal 
   stock        Int  
-   createdAt   DateTime @default(now())
+  status       Boolean  @default(true)
+  likes       LikesByProduct[] 
+  SoldProducts Order[]
+  productsOnShoppingCart ShoppingCart[]
+  category  Category? @relation(fields: [categoryId], references: [id])
+  categoryId   Int?
+  createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+
+model LikesByProduct {
+  product  Product  @relation(fields: [productId], references: [id], onDelete: Cascade) 
+  productId Int
+  user     User   @relation(fields: [userId],references: [id], onDelete: Cascade)
+  userId    Int
+  createdAt DateTime @default(now())
+  @@id([userId,productId])
+}
+
+
+model Order {
+  product  Product  @relation(fields: [productId], references: [id], onDelete: SetNull)
+  productId Int
+  user     User   @relation(fields: [userId],references: [id], onDelete: SetNull)
+  userId    Int
+  quantity  Int 
+  unitPrice Decimal 
+  totalPrice Decimal 
+  createdAt DateTime @default(now())
+  @@id([userId,productId])
+}
+
+model ShoppingCart{
+  product  Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId Int
+  user     User   @relation(fields: [userId],references: [id], onDelete: Cascade)
+  userId    Int
+  quantity  Int
+  createdAt DateTime @default(now())
+  @@id([userId,productId])
 }
 
 model Role {
   id      Int   @id @default(autoincrement())
   name    String @unique
+  users   User[]
    createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+
+model Category {
+  id    Int @id()  @default(autoincrement())
+  name  String   @unique
+  products Product[] 
+  createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }

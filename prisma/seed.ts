@@ -55,6 +55,21 @@ async function main() {
       stock: 5,
     },
   });
+
+  await prisma.category.upsert({
+    where: { name: 'clothes' },
+    update: {},
+    create: {
+      name: 'clothes',
+    },
+  });
+  await prisma.category.upsert({
+    where: { name: 'food' },
+    update: {},
+    create: {
+      name: 'food',
+    },
+  });
 }
 
 // execute the main function

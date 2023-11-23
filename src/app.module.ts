@@ -5,9 +5,19 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ProductsModule } from './products/products.module';
 import { UsersModule } from './users/users.module';
 import { RolesModule } from './roles/roles.module';
+import { ShoppingcartsModule } from './shoppingcarts/shoppingcarts.module';
+import { OrdersModule } from './orders/orders.module';
+import { MulterModule } from '@nestjs/platform-express';
 
 @Module({
-  imports: [PrismaModule, ProductsModule, UsersModule, RolesModule],
+  imports: [
+    PrismaModule,
+    ProductsModule,
+    UsersModule,
+    RolesModule,
+    ShoppingcartsModule,
+    OrdersModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
