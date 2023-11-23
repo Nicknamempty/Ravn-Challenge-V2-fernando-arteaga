@@ -1,21 +1,37 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
-  UploadedFile,
-  UseInterceptors,
 } from '@nestjs/common';
-import { CreateProductDto } from './dto/create-product.dto';
+
 import { UpdateProductDto } from './dto/update-product.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { diskStorage } from 'multer';
-import { extname } from 'path';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { CreateProductDto } from './dto/create-product.dto';
+import { productImageWindowsPath } from 'src/common/const';
 
 @Injectable()
 export class ProductsService {
   constructor(private readonly prismaService: PrismaService) {}
   async create(createProductDto: CreateProductDto) {
-    return await this.prismaService.product.create({ data: createProductDto });
+    const categoryExists = await this.prismaService.category.findFirst({
+      where: { id: Number(createProductDto.categoryId) },
+    });
+    if (!categoryExists) throw new BadRequestException('no category found');
+
+    const { productImage, categoryId, ...product } = createProductDto;
+    return await this.prismaService.product.create({
+      data: {
+        ...product,
+        image: productImageWindowsPath + createProductDto.image,
+        price: Number(createProductDto.price),
+        stock: Number(createProductDto.stock),
+        category: {
+          connect: {
+            id: Number(categoryExists.id),
+          },
+        },
+      },
+    });
   }
 
   async findAll(category?: string) {

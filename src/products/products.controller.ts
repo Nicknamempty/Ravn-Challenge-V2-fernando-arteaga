@@ -16,15 +16,21 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { FileUtils } from 'src/utils/fileManager.util';
+import { ApiConsumes } from '@nestjs/swagger';
 
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Post()
+  @ApiConsumes('multipart/form-data')
   @UseInterceptors(
     FileInterceptor('productImage', {
-      storage: diskStorage(FileUtils.getStorageOptions('./uploads/products')),
+      storage: diskStorage(
+        FileUtils.getStorageOptions(
+          '/mnt/c/Users/ferme/OneDrive/Desktop/products',
+        ),
+      ),
     }),
   )
   create(
