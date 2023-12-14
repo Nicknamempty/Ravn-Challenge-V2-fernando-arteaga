@@ -33,11 +33,11 @@ import { Roles } from 'src/auth/decorators/role.decorator';
 import { User } from 'src/auth/decorators/user.decorator';
 import { LoggedUserDTO } from 'src/users/entities/user.entity';
 @ApiTags('Product')
-@ApiBearerAuth()
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
+  @ApiBearerAuth()
   @UseGuards(RolesGuard)
   @UseGuards(JwtAuthGuard)
   @Roles([ERole.MANAGER])
@@ -62,6 +62,8 @@ export class ProductsController {
     };
     return this.productsService.create(productDataWithPhoto);
   }
+
+  @ApiBearerAuth()
   @UseGuards(RolesGuard)
   @UseGuards(JwtAuthGuard)
   @Roles([ERole.CLIENT])
@@ -70,6 +72,7 @@ export class ProductsController {
     return this.productsService.like(id, user.id);
   }
 
+  @ApiBearerAuth()
   @UseGuards(RolesGuard)
   @UseGuards(JwtAuthGuard)
   @Roles([ERole.CLIENT])
@@ -84,6 +87,7 @@ export class ProductsController {
     return await this.productsService.findAll(category);
   }
 
+  @ApiBearerAuth()
   @UseGuards(RolesGuard)
   @UseGuards(JwtAuthGuard)
   @Roles([ERole.MANAGER])
@@ -96,6 +100,8 @@ export class ProductsController {
     console.log(user);
     return await this.productsService.findAllAsManager(category);
   }
+
+  @ApiBearerAuth()
   @UseGuards(RolesGuard)
   @UseGuards(JwtAuthGuard)
   @Roles([ERole.MANAGER])
@@ -109,24 +115,19 @@ export class ProductsController {
     return await this.productsService.findOne(+id);
   }
 
+  @ApiBearerAuth()
+  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard)
+  @Roles([ERole.MANAGER])
   @Patch(':id/status')
   changeStatus(@Param('id', ParseIntPipe) id: number) {
     return this.productsService.changeStatus(+id);
   }
 
+  @ApiBearerAuth()
   @UseGuards(RolesGuard)
   @UseGuards(JwtAuthGuard)
   @Roles([ERole.MANAGER])
-  @ApiConsumes('multipart/form-data')
-  @UseInterceptors(
-    FileInterceptor('productImage', {
-      storage: diskStorage(
-        FileUtils.getStorageOptions(
-          '/mnt/c/Users/ferme/OneDrive/Desktop/products',
-        ),
-      ),
-    }),
-  )
   @ApiBody({
     type: UpdateProductDto,
     examples: {
