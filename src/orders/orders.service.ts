@@ -4,21 +4,25 @@ import { CreateOrderDto } from './dto/create-order.dto';
 
 @Injectable()
 export class OrdersService {
+  async findAllByClient(id: number) {
+    return await this.prismaService.order.findMany({ where: { userId: id } });
+  }
   constructor(private readonly prismaService: PrismaService) {}
 
   async create(order: CreateOrderDto, userId: number) {
-    const productAlreadyAdded = this.findOne(order.productId, userId);
-    if (productAlreadyAdded === null) {
-      throw new BadRequestException(
-        'this product is already on the shopping cart',
-      );
-    }
     const product = await this.prismaService.product.findFirst({
       where: {
         id: order.productId,
       },
     });
-
+    if (product.stock < order.quantity)
+      throw new BadRequestException('stock error');
+    await this.prismaService.product.update({
+      where: { id: product.id },
+      data: {
+        stock: product.stock - order.quantity,
+      },
+    });
     return await this.prismaService.order.create({
       data: {
         userId,
@@ -36,9 +40,9 @@ export class OrdersService {
     });
   }
 
-  async findOne(productId: number, userId: number) {
+  async findOne(productId: number, userId: number, date: string) {
     return await this.prismaService.order.findFirst({
-      where: { userId, productId },
+      where: { userId, productId, createdAt: date },
     });
   }
 

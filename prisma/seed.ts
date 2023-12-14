@@ -1,13 +1,31 @@
 import { PrismaClient } from '@prisma/client';
-
+import * as bcrypt from 'bcrypt';
 const prisma = new PrismaClient();
 
 async function main() {
-  await prisma.user.upsert({
+  const manager = await prisma.role.upsert({
+    where: { name: 'Manager' },
+    update: {},
+    create: {
+      name: 'Manager',
+    },
+  });
+  const client = await prisma.role.upsert({
+    where: { name: 'Client' },
+    update: {},
+    create: {
+      name: 'Client',
+    },
+  });
+  const defaultPassword = await bcrypt.hash('password123', 12);
+  const defaultPassword2 = await bcrypt.hash('pasword124', 12);
+
+  const userManager = await prisma.user.upsert({
     where: { email: 'fermerinonew@gmail.com' },
     update: {},
     create: {
       email: 'fermerinonew@gmail.com',
+      password: defaultPassword,
     },
   });
 
@@ -16,21 +34,8 @@ async function main() {
     update: {},
     create: {
       email: 'fernand0scar@hotmail.com',
-    },
-  });
-
-  await prisma.role.upsert({
-    where: { name: 'Manager' },
-    update: {},
-    create: {
-      name: 'Manager',
-    },
-  });
-  await prisma.role.upsert({
-    where: { name: 'Client' },
-    update: {},
-    create: {
-      name: 'Client',
+      password: defaultPassword2,
+      roleId: client.id,
     },
   });
 
@@ -70,15 +75,22 @@ async function main() {
       name: 'food',
     },
   });
+
+  await prisma.user.update({
+    where: { id: userManager.id },
+    data: {
+      role: {
+        connect: { id: manager.id },
+      },
+    },
+  });
 }
 
-// execute the main function
 main()
   .catch((e) => {
     console.error(e);
     process.exit(1);
   })
   .finally(async () => {
-    // close Prisma Client at the end
     await prisma.$disconnect();
   });

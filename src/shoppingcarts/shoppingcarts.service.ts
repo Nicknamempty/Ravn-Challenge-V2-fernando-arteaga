@@ -41,9 +41,9 @@ export class ShoppingcartsService {
     });
   }
 
-  async remove(productId: number) {
+  async remove(productId: number, userId) {
     return this.prismaService.shoppingCart.deleteMany({
-      where: { userId: 1, productId },
+      where: { userId, productId },
     });
   }
 }

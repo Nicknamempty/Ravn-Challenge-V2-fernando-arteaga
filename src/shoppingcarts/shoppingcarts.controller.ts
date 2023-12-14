@@ -3,37 +3,54 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { ShoppingcartsService } from './shoppingcarts.service';
-import { ProductUserRelationDto } from 'src/common/dto/product-user.dto';
 
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { Roles } from 'src/auth/decorators/role.decorator';
+import { ERole } from 'src/roles/enums/role.enum';
+import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { User } from 'src/auth/decorators/user.decorator';
+import { LoggedUserDTO } from 'src/users/entities/user.entity';
+import { CreateShoppingcartDto } from './dto/create-shoppingcart.dto';
+
+@ApiTags('Shopping cart ')
+@ApiBearerAuth()
+@UseGuards(RolesGuard)
+@UseGuards(JwtAuthGuard)
+@Roles([ERole.CLIENT])
 @Controller('shoppingcarts')
 export class ShoppingcartsController {
   constructor(private readonly shoppingcartsService: ShoppingcartsService) {}
 
   @Post()
-  addProduct(@Body() productUser: ProductUserRelationDto) {
+  addProduct(
+    @Body() product: CreateShoppingcartDto,
+    @User() user: LoggedUserDTO,
+  ) {
     return this.shoppingcartsService.addToShoppingCart(
-      productUser.productId,
-      productUser.userId,
+      product.productId,
+      user.id,
     );
   }
 
   @Get()
-  findAllByLoggedUser() {
-    return this.shoppingcartsService.findAllByLoggedUser(1);
+  findAllByLoggedUser(@User() user: LoggedUserDTO) {
+    console.log(user);
+    return this.shoppingcartsService.findAllByLoggedUser(user.id);
   }
 
   @Get('productId/:productId')
-  findOne(@Param('productId') productId: number) {
-    return this.shoppingcartsService.findOne(+productId, 1);
+  findOne(@Param('productId') productId: number, @User() user: LoggedUserDTO) {
+    return this.shoppingcartsService.findOne(+productId, user.id);
   }
 
   @Delete(':id')
-  remove(@Param('id') productId: number) {
-    return this.shoppingcartsService.remove(+productId);
+  remove(@Param('id') productId: number, @User() user: LoggedUserDTO) {
+    return this.shoppingcartsService.remove(+productId, user.id);
   }
 }

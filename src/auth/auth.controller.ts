@@ -1,11 +1,41 @@
-import { Controller, Get, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Delete, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { loginUser } from './dto/create-auth.dto';
+import { User } from './decorators/user.decorator';
+import { JwtAuthGuard } from './guards/jwt.guard';
+import { ApiBody, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @ApiBody({
+    type: loginUser,
+    examples: {
+      a: {
+        summary: 'use this example to login as a Manager',
+        value: {
+          email: 'fermerinonew@gmail.com',
+          password: 'password123',
+        },
+      },
+      b: {
+        summary: 'use this example to login as a Client',
+        value: {
+          email: 'fernand0scar@hotmail.com',
+          password: 'pasword124',
+        },
+      },
+      c: {
+        summary: 'wrong credentials',
+        value: {
+          email: 'fermerinonew@gmail.com',
+          password: '11111',
+        },
+      },
+    },
+  })
   @Post('login')
   async login(@Body() user: loginUser) {
     const token = await this.authService.login(user);
@@ -17,10 +47,9 @@ export class AuthController {
     return await this.authService.createUser(user);
   }
 
-  // @Post('register')
-  // async register(@Request() req): Promise<any> {
-  //   const { username, password } = req.body;
-  //   const user = await this.authService.register(username, password);
-  //   return { user };
-  // }
+  @UseGuards(JwtAuthGuard)
+  @Delete('logout')
+  async singout(@User() user: any) {
+    await this.authService.singout(user.email);
+  }
 }

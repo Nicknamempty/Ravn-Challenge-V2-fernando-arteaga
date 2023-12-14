@@ -40,6 +40,23 @@ export class ProductsService {
         category: {
           name: { contains: category?.toLocaleLowerCase() },
         },
+        status: true,
+      },
+      include: {
+        category: true,
+        _count: {
+          select: { likes: true },
+        },
+      },
+    });
+  }
+
+  async findAllAsManager(category?: string) {
+    return await this.prismaService.product.findMany({
+      where: {
+        category: {
+          name: { contains: category?.toLocaleLowerCase() },
+        },
       },
       include: {
         category: true,
@@ -51,6 +68,24 @@ export class ProductsService {
   }
 
   async findOne(id: number) {
+    const product = await this.prismaService.product.findUnique({
+      where: {
+        id,
+        status: true,
+      },
+      include: {
+        _count: {
+          select: { likes: true },
+        },
+      },
+    });
+    if (!product) {
+      throw new NotFoundException('no product was found ):');
+    }
+    return product;
+  }
+
+  async findOneAsManager(id: number) {
     const product = await this.prismaService.product.findUnique({
       where: {
         id,
@@ -74,11 +109,17 @@ export class ProductsService {
     });
   }
 
-  async like(productId: number, userId: number) {
+  async like(id: number, userId: number) {
+    const product = await this.prismaService.product.findFirst({
+      where: { id, status: true },
+    });
+
+    if (!product) throw new NotFoundException();
+
     await this.prismaService.likesByProduct.create({
       data: {
         userId,
-        productId,
+        productId: id,
       },
     });
   }

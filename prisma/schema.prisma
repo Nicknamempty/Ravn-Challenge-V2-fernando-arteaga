@@ -19,6 +19,7 @@ model User {
   PurchasedProducts  Order[]
   role Role? @relation(fields: [roleId],references: [id])
   roleId   Int? 
+  jwt String? 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -60,7 +61,7 @@ model Order {
   unitPrice Decimal 
   totalPrice Decimal 
   createdAt DateTime @default(now())
-  @@id([userId,productId])
+  @@id([userId,productId,createdAt])
 }
 
 model ShoppingCart{

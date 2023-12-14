@@ -9,6 +9,8 @@ import { ShoppingcartsModule } from './shoppingcarts/shoppingcarts.module';
 import { OrdersModule } from './orders/orders.module';
 
 import { AuthModule } from './auth/auth.module';
+import { JwtModule } from '@nestjs/jwt';
+import { CategoriesModule } from './categories/categories.module';
 
 @Module({
   imports: [
@@ -19,6 +21,11 @@ import { AuthModule } from './auth/auth.module';
     ShoppingcartsModule,
     OrdersModule,
     AuthModule,
+    JwtModule.register({
+      secret: '123',
+      signOptions: { expiresIn: '1d' },
+    }),
+    CategoriesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

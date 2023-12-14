@@ -1,12 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import {
-  IsInt,
-  IsNotEmpty,
-  IsNumberString,
-  IsPositive,
-  Min,
-} from 'class-validator';
+import { IsInt, IsNotEmpty, Min } from 'class-validator';
 
 export class CreateProductDto {
   @ApiProperty()
