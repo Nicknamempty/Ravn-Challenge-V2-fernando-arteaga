@@ -97,7 +97,6 @@ export class ProductsController {
     @User() user: any,
     @Query('category') category: string,
   ) {
-    console.log(user);
     return await this.productsService.findAllAsManager(category);
   }
 

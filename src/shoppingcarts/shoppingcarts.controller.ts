@@ -40,7 +40,6 @@ export class ShoppingcartsController {
 
   @Get()
   findAllByLoggedUser(@User() user: LoggedUserDTO) {
-    console.log(user);
     return this.shoppingcartsService.findAllByLoggedUser(user.id);
   }
 
